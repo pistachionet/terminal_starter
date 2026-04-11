@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# create — spin up a tmux workspace in the current directory
+# Usage: navigate to a project directory, then run `create`
+
+SESSION_NAME=$(basename "$PWD" | tr '.' '_')
+
+# If already inside tmux, bail
+if [ -n "$TMUX" ]; then
+  echo "Already in a tmux session."
+  exit 1
+fi
+
+# Attach if session already exists
+if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
+  tmux attach-session -t "$SESSION_NAME"
+  exit 0
+fi
+
+# Window 0: terminal
+tmux new-session -d -s "$SESSION_NAME" -n "terminal" -c "$PWD"
+
+# Window 1: yazi
+tmux new-window -t "$SESSION_NAME" -n "yazi" -c "$PWD" "yazi"
+
+# Window 2: opencode (runs in a shell so quitting doesn't close the window)
+tmux new-window -t "$SESSION_NAME" -n "opencode" -c "$PWD"
+tmux send-keys -t "$SESSION_NAME:opencode" "opencode" Enter
+
+# Window 3: lazygit (runs in a shell so quitting doesn't close the window)
+tmux new-window -t "$SESSION_NAME" -n "lazygit" -c "$PWD"
+tmux send-keys -t "$SESSION_NAME:lazygit" "lazygit" Enter
+
+# Start on window 0
+tmux select-window -t "$SESSION_NAME:0"
+
+# Attach
+tmux attach-session -t "$SESSION_NAME"

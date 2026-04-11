@@ -1,0 +1,4 @@
+# Disable all background/auto processes to minimize idle resource usage
+git:
+  autoFetch: false
+  autoRefresh: false
