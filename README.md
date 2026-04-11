@@ -54,6 +54,9 @@ AGENT_CMD=""
 Set `AGENT_CMD` to whatever you install. A 4th "agent" window will appear automatically.
 
 ```bash
+# OpenCode
+AGENT_CMD="opencode"
+
 # GitHub Copilot CLI
 AGENT_CMD="gh copilot"
 
