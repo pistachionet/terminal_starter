@@ -3,13 +3,14 @@
 # Usage: navigate to a project directory, then run `create`
 #
 # Customize AGENT_CMD below to set your preferred coding tool for window 2.
-# Set to empty string "" to skip window 2 entirely (3-window layout).
+# Set to empty string "" to skip window 2 entirely (terminal + yazi only).
 # Examples:
+#   AGENT_CMD="opencode"
 #   AGENT_CMD="gh copilot"
 #   AGENT_CMD="aider"
-#   AGENT_CMD=""          # no agent window
+#   AGENT_CMD=""          # terminal + yazi only, no agent window
 
-AGENT_CMD=""  # <-- set your agent tool here, or leave empty for no agent window
+AGENT_CMD="opencode"  # <-- set your agent tool here, or leave empty for no agent window
 
 SESSION_NAME=$(basename "$PWD" | tr '.' '_')
 
@@ -25,7 +26,7 @@ if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
   exit 0
 fi
 
-# Window 0: terminal
+# Window 0: terminal (persistent anchor — keeps session alive)
 tmux new-session -d -s "$SESSION_NAME" -n "terminal" -c "$PWD"
 
 # Window 1: yazi
@@ -35,14 +36,10 @@ tmux new-window -t "$SESSION_NAME" -n "yazi" -c "$PWD" "yazi"
 if [ -n "$AGENT_CMD" ]; then
   tmux new-window -t "$SESSION_NAME" -n "agent" -c "$PWD"
   tmux send-keys -t "$SESSION_NAME:agent" "$AGENT_CMD" Enter
+  tmux select-window -t "$SESSION_NAME:2"
+else
+  tmux select-window -t "$SESSION_NAME:0"
 fi
-
-# Window 3 (or 2 if no agent): lazygit
-tmux new-window -t "$SESSION_NAME" -n "lazygit" -c "$PWD"
-tmux send-keys -t "$SESSION_NAME:lazygit" "lazygit" Enter
-
-# Start on window 0
-tmux select-window -t "$SESSION_NAME:0"
 
 # Attach
 tmux attach-session -t "$SESSION_NAME"

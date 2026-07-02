@@ -1,6 +1,6 @@
-# Terminal Starter (No Agent)
+# Terminal Starter
 
-My macOS terminal setup — tmux, neovim, yazi, lazygit. No coding agent tools included.
+My macOS terminal setup — tmux, neovim, yazi, lazygit, opencode. Defaults to a 3-window tmux workspace (terminal + yazi + coding agent); lazygit config included for standalone use.
 
 ## Setup
 
@@ -12,7 +12,7 @@ My macOS terminal setup — tmux, neovim, yazi, lazygit. No coding agent tools i
 git clone -b free__from_coding_agent https://github.com/pistachionet/terminal_starter.git ~/terminal_starter
 
 # 3. Install tools
-brew install tmux neovim yazi lazygit go node diff-so-fancy
+brew install tmux neovim yazi lazygit opencode go node diff-so-fancy
 
 # 4. Oh-My-Zsh + plugins + theme
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
@@ -41,22 +41,19 @@ git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 
 The `create` script has a configurable `AGENT_CMD` variable at the top of `~/.local/bin/create`.
 
-### Option A: No agent tool (default)
+### Option A: OpenCode (default)
 
-Leave it empty. You get a 3-window layout: terminal, yazi, lazygit.
+Out of the box you get a 3-window layout: terminal (window 0), yazi (window 1), opencode (window 2, focused on attach).
 
 ```bash
-AGENT_CMD=""
+AGENT_CMD="opencode"
 ```
 
-### Option B: Add a tool later
+### Option B: Use a different tool
 
-Set `AGENT_CMD` to whatever you install. A 4th "agent" window will appear automatically.
+Set `AGENT_CMD` to whatever you install. The "agent" window will run it instead.
 
 ```bash
-# OpenCode
-AGENT_CMD="opencode"
-
 # GitHub Copilot CLI
 AGENT_CMD="gh copilot"
 
@@ -70,19 +67,13 @@ AGENT_CMD="claude"
 AGENT_CMD="your-tool-here"
 ```
 
-### Option C: Remove window 2 permanently
+### Option C: No agent window
 
-If you never want an agent window, delete these lines from `~/.local/bin/create`:
+Set `AGENT_CMD` to an empty string. You get a 2-window layout: terminal + yazi.
 
 ```bash
-# Window 2: agent tool (optional)
-if [ -n "$AGENT_CMD" ]; then
-  tmux new-window -t "$SESSION_NAME" -n "agent" -c "$PWD"
-  tmux send-keys -t "$SESSION_NAME:agent" "$AGENT_CMD" Enter
-fi
+AGENT_CMD=""
 ```
-
-And delete the `AGENT_CMD` variable at the top.
 
 ## File Map
 
@@ -102,4 +93,4 @@ And delete the `AGENT_CMD` variable at the top.
 cd ~/any-project && create
 ```
 
-Opens a tmux session with: terminal, yazi, lazygit (+ agent if configured).
+Opens a tmux session with: terminal, yazi (+ agent if configured). The agent window (window 2) is focused on attach; terminal (window 0) is a persistent anchor so the session survives quitting yazi. lazygit is not launched by `create` — run it standalone whenever needed.
